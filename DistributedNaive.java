@@ -1,10 +1,10 @@
 package in.ac.iitkgp.atdc;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -15,7 +15,7 @@ import org.apache.spark.api.java.function.PairFlatMapFunction;
 
 import scala.Tuple2;
 
-public class DistributedNaive {
+public class DistributedNaive implements Serializable{
 
 	public JavaRDD<Tuple2<Tuple2<Integer, Integer>, Double>> multiply(
 			JavaRDD<Tuple2<Tuple2<Integer, Integer>, Double>> A, JavaRDD<Tuple2<Tuple2<Integer, Integer>, Double>> B,
@@ -137,7 +137,7 @@ public class DistributedNaive {
 						String[] array = str.split(",");
 						int row = Integer.parseInt(array[0]);
 						int col = Integer.parseInt(array[1]);
-						int value = Integer.parseInt(array[2]);
+						double value = Double.parseDouble(array[2]);
 						return new Tuple2(new Tuple2(row, col), value);
 					}
 				});
@@ -150,12 +150,12 @@ public class DistributedNaive {
 						String[] array = str.split(",");
 						int row = Integer.parseInt(array[0]);
 						int col = Integer.parseInt(array[1]);
-						int value = Integer.parseInt(array[2]);
+						double value = Double.parseDouble(array[2]);
 						return new Tuple2(new Tuple2(row, col), value);
 					}
 				});
 
-		distributedNaive.multiply(A, B, rowA, colA, colB);
+		distributedNaive.print(distributedNaive.multiply(A, B, rowA, colA, colB));
 	}
 
 }
