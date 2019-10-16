@@ -1328,7 +1328,7 @@ public class DSNew implements Serializable {
 					}
 				});
 				
-				map1.repartition(10000).persist(StorageLevel.DISK_ONLY());
+				//map1.repartition(10000).persist(StorageLevel.DISK_ONLY());
 
 				JavaPairRDD<String, Iterable<Block>> map2 = map1.groupByKey();
 
@@ -1704,8 +1704,8 @@ public class DSNew implements Serializable {
 
 				});
 
-				System.out.println("called");
-				reduce.repartition(10000);
+				//System.out.println("called");
+				//reduce.repartition(10000);
 
 			}
 
