@@ -24,6 +24,7 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.mllib.linalg.DenseMatrix;
 import org.apache.spark.storage.StorageLevel;
+import org.jblas.DoubleMatrix;
 
 import scala.Tuple2;
 
@@ -1849,9 +1850,8 @@ public class DSNew implements Serializable {
 		Block block = new Block();
 		block.rowIndex = block1.rowIndex;
 		block.columnIndex = block1.columnIndex;
-		// Strassen naiveStrassen = new Strassen();
 
-		int size = block1.matrix.length;
+		/*int size = block1.matrix.length;
 		double[] proArr = new double[block1.matrix.length];
 		double[][] mat3 = new double[block1.matrix.length][block1.matrix.length];
 
@@ -1882,10 +1882,16 @@ public class DSNew implements Serializable {
 				mat3[j][i] = proArr[k];
 				k++;
 			}
-		}
+		}*/
 		// mat3 = mat1.mmul(mat2).toArray2();
 		// NaiveMethod naive = new NaiveMethod();
 		// mat3 = naive.multiply(block1.matrix, block2.matrix);
+		
+		int size = block1.matrix.length;
+		double[][] mat3 = new double[block1.matrix.length][block1.matrix.length];
+		DoubleMatrix mat1 = new DoubleMatrix(block1.matrix);
+		DoubleMatrix mat2 = new DoubleMatrix(block2.matrix);
+		mat3 = mat1.mmul(mat2).toArray2();
 
 		block.matrix = mat3;
 		block.matname = name;
