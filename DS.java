@@ -36,10 +36,11 @@ import scala.Tuple2;
 public class DS implements Serializable {
 
 	public int count;
-	//private static final Logger logger = Logger.getLogger(DistributedStrassenNew.class);
+	// private static final Logger logger =
+	// Logger.getLogger(DistributedStrassenNew.class);
 
 	public DS() {
-		count = 0;	
+		count = 0;
 	}
 
 	public static void main(String args[]) {
@@ -59,13 +60,15 @@ public class DS implements Serializable {
 			// Logger.getLogger(DistributedNaive.class.getName()).log(Level.SEVERE,
 			// null, ex);
 		}
-		
+
 		// getting the context and spark configuration
-		SparkConf sparkConf = new SparkConf().setAppName("Strassen_" + file + "_" + blockSize).set("spark.driver.maxResultSize", "3g");;
+		SparkConf sparkConf = new SparkConf().setAppName("Strassen_" + file + "_" + blockSize)
+				.set("spark.driver.maxResultSize", "3g");
+		;
 		JavaSparkContext ctx = new JavaSparkContext(sparkConf);
 
 		// getting the input file into JavaRDD of strings
-		JavaRDD<String> lines = ctx.textFile("hdfs:/root/utkarsh/stark/" + file, partitions);		
+		JavaRDD<String> lines = ctx.textFile("hdfs:/root/utkarsh/stark/" + file, partitions);
 		// lines.saveAsTextFile("hdfs://192.168.0.109:8020/user/research/chandanm/inputMatrix");
 
 		int size = (int) Math.sqrt(lines.count() / 2) / blockSize;
@@ -126,7 +129,6 @@ public class DS implements Serializable {
 
 			}
 		});
-		
 
 		/* Prepare Matrix B as JavaRDD<Block> */
 		JavaRDD<Block> B = IndexedLines.filter(new Function<String, Boolean>() {
@@ -175,16 +177,15 @@ public class DS implements Serializable {
 			}
 		});
 
-		//System.out.println(A.count());
-		//System.out.println(B.count());
-		
-		
+		// System.out.println(A.count());
+		// System.out.println(B.count());
+
 		DS strassen = new DS();
 		long time1 = System.currentTimeMillis();
 		// System.out.println("INITIAL SIZE:" + size);
 		JavaRDD<Block> result = strassen.multiply(ctx, A, B, size, blockSize);
-		//result.cache();
-		//result.count();
+		// result.cache();
+		// result.count();
 		System.out.println(result.count());
 		long time2 = System.currentTimeMillis();
 		System.out.println((time2 - time1) / 1000);
@@ -382,7 +383,7 @@ public class DS implements Serializable {
 
 					return new Tuple2(key, block);
 				}
-			});						
+			});
 
 			JavaPairRDD<String, Iterable<Block>> map4 = indexedMatrices.groupByKey();
 
@@ -411,8 +412,6 @@ public class DS implements Serializable {
 					return blockC;
 				}
 			});
-			
-			
 
 		} else {
 			size = size / 2;
@@ -439,11 +438,12 @@ public class DS implements Serializable {
 							Block block2 = new Block();
 							Block block3 = new Block();
 							Block block4 = new Block();
-							double[][] mat = new double[bBlockSize.value()][bBlockSize.value()];
+
 							key1 = "M1," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 0));
 							key2 = "M3," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 2));
 							key3 = "M5," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 4));
 							key4 = "M6," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 5));
+
 							block1.matname = "A11";
 							block1.rowIndex = t.rowIndex % bSize.value();
 							block1.columnIndex = t.columnIndex % bSize.value();
@@ -456,31 +456,12 @@ public class DS implements Serializable {
 							block4.matname = "A11";
 							block4.rowIndex = t.rowIndex % bSize.value();
 							block4.columnIndex = t.columnIndex % bSize.value();
-							if (t.allZero == true) {
-								block1.matrix = null;
-								block1.allZero = true;
-								block2.matrix = null;
-								block2.allZero = true;
-								block3.matrix = null;
-								block3.allZero = true;
-								block4.matrix = null;
-								block4.allZero = true;
-							} else {
-								/*for (int i = 0; i < mat.length; i++) {
-									for (int j = 0; j < mat.length; j++) {
-										mat[i][j] = t.matrix[i][j];
-									}
-								}*/
-								block1.matrix = t.matrix;
-								block1.allZero = false;
-								block2.matrix = t.matrix;
-								block2.allZero = false;
-								block3.matrix = t.matrix;
-								block3.allZero = false;
-								block4.matrix = t.matrix;
-								block4.allZero = false;
-							}
-							// block1.matrix = t.matrix;
+
+							block1.matrix = t.matrix;
+							block2.matrix = t.matrix;
+							block3.matrix = t.matrix;
+							block4.matrix = t.matrix;
+
 							list.add(new Tuple2(key1, block1));
 							list.add(new Tuple2(key2, block2));
 							list.add(new Tuple2(key3, block3));
@@ -488,64 +469,40 @@ public class DS implements Serializable {
 						} else if (t.rowIndex / bSize.value() == 0 && t.columnIndex / bSize.value() == 1) {
 							Block block1 = new Block();
 							Block block2 = new Block();
-							double[][] mat = new double[bBlockSize.value()][bBlockSize.value()];
+
 							key1 = "M5," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 4));
 							key2 = "M7," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 6));
+
 							block1.matname = "A12";
 							block1.rowIndex = t.rowIndex % bSize.value();
 							block1.columnIndex = t.columnIndex % bSize.value();
 							block2.matname = "A12";
 							block2.rowIndex = t.rowIndex % bSize.value();
 							block2.columnIndex = t.columnIndex % bSize.value();
-							if (t.allZero == true) {
-								block1.matrix = null;
-								block1.allZero = true;
-								block2.matrix = null;
-								block2.allZero = true;
-							} else {
-								/*for (int i = 0; i < mat.length; i++) {
-									for (int j = 0; j < mat.length; j++) {
-										mat[i][j] = t.matrix[i][j];
-									}
-								}*/
-								block1.matrix = t.matrix;
-								block1.allZero = false;
-								block2.matrix = t.matrix;
-								block2.allZero = false;
-							}
-							// block1.matrix = t.matrix;
+
+							block1.matrix = t.matrix;
+							block2.matrix = t.matrix;
+
 							list.add(new Tuple2(key1, block1));
 							list.add(new Tuple2(key2, block2));
 
 						} else if (t.rowIndex / bSize.value() == 1 && t.columnIndex / bSize.value() == 0) {
 							Block block1 = new Block();
 							Block block2 = new Block();
-							double[][] mat = new double[bBlockSize.value()][bBlockSize.value()];
+
 							key1 = "M2," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 1));
 							key2 = "M6," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 5));
+
 							block1.matname = "A21";
 							block1.rowIndex = t.rowIndex % bSize.value();
 							block1.columnIndex = t.columnIndex % bSize.value();
 							block2.matname = "A21";
 							block2.rowIndex = t.rowIndex % bSize.value();
 							block2.columnIndex = t.columnIndex % bSize.value();
-							if (t.allZero == true) {
-								block1.matrix = null;
-								block1.allZero = true;
-								block2.matrix = null;
-								block2.allZero = true;
-							} else {
-								/*for (int i = 0; i < mat.length; i++) {
-									for (int j = 0; j < mat.length; j++) {
-										mat[i][j] = t.matrix[i][j];
-									}
-								}*/
-								block1.matrix = t.matrix;
-								block1.allZero = false;
-								block2.matrix = t.matrix;
-								block2.allZero = false;
-							}
-							// block1.matrix = t.matrix;
+
+							block1.matrix = t.matrix;
+							block2.matrix = t.matrix;
+
 							list.add(new Tuple2(key1, block1));
 							list.add(new Tuple2(key2, block2));
 						} else {
@@ -553,11 +510,12 @@ public class DS implements Serializable {
 							Block block2 = new Block();
 							Block block3 = new Block();
 							Block block4 = new Block();
-							double[][] mat = new double[bBlockSize.value()][bBlockSize.value()];
+
 							key1 = "M1," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 0));
 							key2 = "M2," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 1));
 							key3 = "M4," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 3));
 							key4 = "M7," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 6));
+
 							block1.matname = "A22";
 							block1.rowIndex = t.rowIndex % bSize.value();
 							block1.columnIndex = t.columnIndex % bSize.value();
@@ -570,31 +528,12 @@ public class DS implements Serializable {
 							block4.matname = "A22";
 							block4.rowIndex = t.rowIndex % bSize.value();
 							block4.columnIndex = t.columnIndex % bSize.value();
-							if (t.allZero == true) {
-								block1.matrix = null;
-								block1.allZero = true;
-								block2.matrix = null;
-								block2.allZero = true;
-								block3.matrix = null;
-								block3.allZero = true;
-								block4.matrix = null;
-								block4.allZero = true;
-							} else {
-								/*for (int i = 0; i < mat.length; i++) {
-									for (int j = 0; j < mat.length; j++) {
-										mat[i][j] = t.matrix[i][j];
-									}
-								}*/
-								block1.matrix = t.matrix;
-								block1.allZero = false;
-								block2.matrix = t.matrix;
-								block2.allZero = false;
-								block3.matrix = t.matrix;
-								block3.allZero = false;
-								block4.matrix = t.matrix;
-								block4.allZero = false;
-							}
-							// block1.matrix = t.matrix;
+
+							block1.matrix = t.matrix;
+							block2.matrix = t.matrix;
+							block3.matrix = t.matrix;
+							block4.matrix = t.matrix;
+
 							list.add(new Tuple2(key1, block1));
 							list.add(new Tuple2(key2, block2));
 							list.add(new Tuple2(key3, block3));
@@ -607,11 +546,12 @@ public class DS implements Serializable {
 							Block block2 = new Block();
 							Block block3 = new Block();
 							Block block4 = new Block();
-							double[][] mat = new double[bBlockSize.value()][bBlockSize.value()];
+
 							key1 = "M1," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 0));
 							key2 = "M2," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 1));
 							key3 = "M4," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 3));
 							key4 = "M6," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 5));
+
 							block1.matname = "B11";
 							block1.rowIndex = t.rowIndex % bSize.value();
 							block1.columnIndex = t.columnIndex % bSize.value();
@@ -624,31 +564,12 @@ public class DS implements Serializable {
 							block4.matname = "B11";
 							block4.rowIndex = t.rowIndex % bSize.value();
 							block4.columnIndex = t.columnIndex % bSize.value();
-							if (t.allZero == true) {
-								block1.matrix = null;
-								block1.allZero = true;
-								block2.matrix = null;
-								block2.allZero = true;
-								block3.matrix = null;
-								block3.allZero = true;
-								block4.matrix = null;
-								block4.allZero = true;
-							} else {
-								/*for (int i = 0; i < mat.length; i++) {
-									for (int j = 0; j < mat.length; j++) {
-										mat[i][j] = t.matrix[i][j];
-									}
-								}*/
-								block1.matrix = t.matrix;
-								block1.allZero = false;
-								block2.matrix = t.matrix;
-								block2.allZero = false;
-								block3.matrix = t.matrix;
-								block3.allZero = false;
-								block4.matrix = t.matrix;
-								block4.allZero = false;
-							}
-							// block1.matrix = t.matrix;
+
+							block1.matrix = t.matrix;
+							block2.matrix = t.matrix;
+							block3.matrix = t.matrix;
+							block4.matrix = t.matrix;
+
 							list.add(new Tuple2(key1, block1));
 							list.add(new Tuple2(key2, block2));
 							list.add(new Tuple2(key3, block3));
@@ -656,64 +577,42 @@ public class DS implements Serializable {
 						} else if (t.rowIndex / bSize.value() == 0 && t.columnIndex / bSize.value() == 1) {
 							Block block1 = new Block();
 							Block block2 = new Block();
-							double[][] mat = new double[bBlockSize.value()][bBlockSize.value()];
+
 							key1 = "M3," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 2));
 							key2 = "M6," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 5));
+
 							block1.matname = "B12";
 							block1.rowIndex = t.rowIndex % bSize.value();
 							block1.columnIndex = t.columnIndex % bSize.value();
 							block2.matname = "B12";
 							block2.rowIndex = t.rowIndex % bSize.value();
 							block2.columnIndex = t.columnIndex % bSize.value();
-							if (t.allZero == true) {
-								block1.matrix = null;
-								block1.allZero = true;
-								block2.matrix = null;
-								block2.allZero = true;
-							} else {
-								/*for (int i = 0; i < mat.length; i++) {
-									for (int j = 0; j < mat.length; j++) {
-										mat[i][j] = t.matrix[i][j];
-									}
-								}*/
-								block1.matrix = t.matrix;
-								block1.allZero = false;
-								block2.matrix = t.matrix;
-								block2.allZero = false;
-							}
-							// block1.matrix = t.matrix;
+
+							block1.matrix = t.matrix;
+							block2.matrix = t.matrix;
+
 							list.add(new Tuple2(key1, block1));
 							list.add(new Tuple2(key2, block2));
 
 						} else if (t.rowIndex / bSize.value() == 1 && t.columnIndex / bSize.value() == 0) {
 							Block block1 = new Block();
 							Block block2 = new Block();
-							double[][] mat = new double[bBlockSize.value()][bBlockSize.value()];
+
 							key1 = "M4," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 3));
 							key2 = "M7," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 6));
+
 							block1.matname = "B21";
 							block1.rowIndex = t.rowIndex % bSize.value();
 							block1.columnIndex = t.columnIndex % bSize.value();
 							block2.matname = "B21";
 							block2.rowIndex = t.rowIndex % bSize.value();
 							block2.columnIndex = t.columnIndex % bSize.value();
-							if (t.allZero == true) {
-								block1.matrix = null;
-								block1.allZero = true;
-								block2.matrix = null;
-								block2.allZero = true;
-							} else {
-								/*for (int i = 0; i < mat.length; i++) {
-									for (int j = 0; j < mat.length; j++) {
-										mat[i][j] = t.matrix[i][j];
-									}
-								}*/
-								block1.matrix = t.matrix;
-								block1.allZero = false;
-								block2.matrix = t.matrix;
-								block2.allZero = false;
-							}
-							// block1.matrix = t.matrix;
+
+							block1.matrix = t.matrix;
+							block1.allZero = false;
+							block2.matrix = t.matrix;
+							block2.allZero = false;
+
 							list.add(new Tuple2(key1, block1));
 							list.add(new Tuple2(key2, block2));
 
@@ -722,11 +621,12 @@ public class DS implements Serializable {
 							Block block2 = new Block();
 							Block block3 = new Block();
 							Block block4 = new Block();
-							double[][] mat = new double[bBlockSize.value()][bBlockSize.value()];
+
 							key1 = "M1," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 0));
 							key2 = "M3," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 2));
 							key3 = "M5," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 4));
 							key4 = "M7," + Integer.toString(((Integer.parseInt(t.matname.split(",")[2]) * 7) + 6));
+
 							block1.matname = "B22";
 							block1.rowIndex = t.rowIndex % bSize.value();
 							block1.columnIndex = t.columnIndex % bSize.value();
@@ -739,31 +639,12 @@ public class DS implements Serializable {
 							block4.matname = "B22";
 							block4.rowIndex = t.rowIndex % bSize.value();
 							block4.columnIndex = t.columnIndex % bSize.value();
-							if (t.allZero == true) {
-								block1.matrix = null;
-								block1.allZero = true;
-								block2.matrix = null;
-								block2.allZero = true;
-								block3.matrix = null;
-								block3.allZero = true;
-								block4.matrix = null;
-								block4.allZero = true;
-							} else {
-								/*for (int i = 0; i < mat.length; i++) {
-									for (int j = 0; j < mat.length; j++) {
-										mat[i][j] = t.matrix[i][j];
-									}
-								}*/
-								block1.matrix = t.matrix;
-								block1.allZero = false;
-								block2.matrix = t.matrix;
-								block2.allZero = false;
-								block3.matrix = t.matrix;
-								block3.allZero = false;
-								block4.matrix = t.matrix;
-								block4.allZero = false;
-							}
-							// block1.matrix = t.matrix;
+
+							block1.matrix = t.matrix;
+							block2.matrix = t.matrix;
+							block3.matrix = t.matrix;
+							block4.matrix = t.matrix;
+
 							list.add(new Tuple2(key1, block1));
 							list.add(new Tuple2(key2, block2));
 							list.add(new Tuple2(key3, block3));
@@ -1149,7 +1030,7 @@ public class DS implements Serializable {
 				}
 
 			});
-			
+
 			JavaRDD<Block> a = map3.filter(new Function<Block, Boolean>() {
 
 				@Override
@@ -1157,10 +1038,10 @@ public class DS implements Serializable {
 					return t1.matname.split(",")[0].equals("A");
 				}
 			});
-			
-			//a.setName("A RDD");
-			//a.cache();
-			//a.count();
+
+			// a.setName("A RDD");
+			// a.cache();
+			// a.count();
 
 			JavaRDD<Block> b = map3.filter(new Function<Block, Boolean>() {
 
@@ -1169,10 +1050,10 @@ public class DS implements Serializable {
 					return t1.matname.split(",")[0].equals("B");
 				}
 			});
-			
-			//b.setName("B RDD");
-			//b.cache();
-			//b.count();
+
+			// b.setName("B RDD");
+			// b.cache();
+			// b.count();
 
 			JavaRDD<Block> result = multiply(ctx, a, b, size, blockSize);
 
@@ -1188,10 +1069,10 @@ public class DS implements Serializable {
 					return new Tuple2(key, t);
 				}
 			});
-			
-			//group.setName("Group RDD after multiplication "+count);
-			//group.cache();
-			//group.count();
+
+			// group.setName("Group RDD after multiplication "+count);
+			// group.cache();
+			// group.count();
 
 			JavaPairRDD<String, Iterable<Block>> group1 = group.groupByKey();
 			result1 = group1.flatMap(new FlatMapFunction<Tuple2<String, Iterable<Block>>, Block>() {
@@ -1258,10 +1139,10 @@ public class DS implements Serializable {
 					return blockList.iterator();
 				}
 			});
-			
-			//result1.setName("result RDD at step "+count);
-			//result1.cache();
-			//result1.count();
+
+			// result1.setName("result RDD at step "+count);
+			// result1.cache();
+			// result1.count();
 
 		}
 
@@ -1284,7 +1165,7 @@ public class DS implements Serializable {
 
 		return block;
 	}
-	
+
 	public Block add(Block block1, Block block2) {
 		Block block = new Block();
 		block.rowIndex = block1.rowIndex;
@@ -1315,7 +1196,7 @@ public class DS implements Serializable {
 
 		return block;
 	}
-	
+
 	public Block add(Block block1, Block block2, String key, String matName) {
 		Block block = new Block();
 		block.rowIndex = block1.rowIndex;
